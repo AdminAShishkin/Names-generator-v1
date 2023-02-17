@@ -1,0 +1,279 @@
+#include <iostream>
+#include <string>
+#include <stdlib.h> 
+#include <ctime>
+#include <cstdlib>
+#include <windows.h>
+#include <fstream>
+using namespace std;
+class domainuser
+{
+private:
+	string name;
+	string surname;
+	string login;
+	string domainname1;
+	string domainname2;
+	string password;
+	string mobilephone;
+	string HomePhone;
+	string OfficePhone;
+	string fax;
+	char pol;    //is not used
+	string postfix = "";
+public:
+	bool samelogin;
+	domainuser()
+	{
+		name = "default", surname = "default", login = "default", domainname1 = "default", domainname2 = "", password = "P@ssword!_15342", pol = 'M', fax="4317777";
+	};
+	~domainuser() {};
+	void getusername(string n, string s)
+	{
+		name = n;
+		surname = s;
+	}
+	void createMobilePhone(int postfix)
+	{
+		mobilephone = to_string(postfix);
+	}
+	void setpassword(string domainpass)
+	{
+		password = domainpass;
+	}
+	void makeADnames()     //show on screen
+	{
+		cout <<
+			"New-ADUser -Name" << " " << "\"" << name << " " << surname << "\""
+			<< " -GivenName" << " " << "\"" << "" << name << "\""
+			<< " -Surname " << "\"" << surname << "\""
+			<< " -SamAccountName " << "\"" << login << "\""
+			<< " -DisplayName " << "\"" << login << "\""
+			<< " -UserPrincipalName " << "\"" << login << "@" << domainname1 << "." << domainname2 << "\""
+			<< " -Path " << "\"" << "OU=Users" << "\""
+			<< " -AccountPassword (Read-Host -AsSecureString) " << "\"" << password << "\""
+			<< " -PasswordNeverExpires $true"
+			<< " -Enabled $true"
+			<< " -MobilePhone " << "\"" << "+790" << mobilephone << "\""  
+			<< " -EmailAddress "<<login<<"@"<<domainname1<<"."<<domainname2<<endl;
+	}
+	string showobj()
+	{
+		string a = "\"";
+		string nameobj =
+			"New-ADUser -Name " + a + name + " " + surname + a +
+			" -GivenName " + a + name + a +
+			" -Surname " + a + surname + a +
+			" -SamAccountName " + a + login + a +
+			" -DisplayName " + a + login + a +
+			" -UserPrincipalName " + a + login + "@" + domainname1 + "." + domainname2 + a +
+			" -Path " + a + "CN=Users, DC =" + domainname1 + "," + " DC=" + domainname2 + a +
+			" -AccountPassword (ConvertTo-SecureString -AsPlainText '" + password+ "' -Force )" +
+			" -PasswordNeverExpires $true" +
+			" -Enabled $true" +
+			" -MobilePhone " + a + "+790" + mobilephone + a+
+			" -HomePhone " + a + "41" + HomePhone + a +
+			" -OfficePhone " + a + "42" + OfficePhone + a +
+			" -Fax " + a + fax + a +
+			" -EmailAddress " + a + login + "@" + domainname1 + "." + domainname2 + a;
+		return nameobj;
+	}
+	string createCSV()
+	{
+		string nameobjcsv =
+			"|" + name + " " + surname +
+			"|" + name +
+			"|" + surname +
+			"|" + login +
+			"|" + login +
+			"|" + login + "@" + domainname1 + "." + domainname2 +
+			"|" + password +
+			"|" + "42" + OfficePhone +
+			"|" + "41" + HomePhone +
+			"|" + fax +
+			"|" + "+790" + mobilephone+ "|";
+		return nameobjcsv;
+	}
+	void getlogin()
+	{
+		login = name[0] + surname;
+	}
+	string returnlogin()
+	{
+		return login;
+	}
+	void getpol(char po)
+	{
+		pol = po;
+	}
+	void getdomainname(string d1, string d2)
+	{
+		domainname1 = d1;
+		domainname2 = d2;
+	}
+	void getHomePhone(int hp)
+	{
+		HomePhone = to_string(hp);
+	}
+	void getOfficePhone(int op)
+	{
+		OfficePhone = to_string(op);
+	}
+	void changePostfix(int newpostfix)
+	{
+		login = login+to_string(newpostfix);
+	}
+	void flagToSameLogin(bool flag)
+	{
+		samelogin = flag;
+	}
+};
+int main()
+
+{
+	srand(time(NULL)); //randomizing initialization
+	bool samelogin = false;
+	int sameQuantity = 0;
+	int const namenumber = 52; //40;      //quantity of names for array
+	int const surnamenumber = 120; //110;      //quantity of surnames for array
+	int UserQuantity = 1;     //default meaning
+	string domain1;         //@domain1.domain2
+	string domain2;
+	string pass;            //password instead of default pass_15342
+	int sexrate = 0;		    // male quantity
+	int attempt = 0;
+	HANDLE col;
+	col = GetStdHandle(STD_OUTPUT_HANDLE);
+	string MaleNames[namenumber] =
+	{
+		"Alexander","Alexey","Elisey","Arkadiy", "Dmitriy", "Sergei", "Oleg", "Victor", "Denis", "Vladimir", "Anatoliy","Lev","Ivan", "Eugeniy", "Mikhail", "Andrey", "Nikita", "Artem",
+		"Gennadiy", "Nikolay", "Vasiliy", "Semen", "Zakhar", "Ruslan", "Roman", "German", "Danila", "Igor", "Fedor", "Pavel", "Leonid", "Vyacheclav", "Yakov", "Timofey", "Stepan", "Valeriy"
+		, "Yuriy", "Valentin", "Oles", "Boris", "Ramzan", "Vitaliy", "German", "Artur", "Tigran", "Timur", "Luka", "Ilya", "Gerasim", "Islam", "Maksim", "Spiridon"
+	};
+	string FemaleNames[namenumber] =
+	{
+		"Alexandra","Alena","Anna", "Daria", "Maria","Margarita", "Irina", "Elena", "Nadezhda", "Vera", "Lyubov", "Oksana", "Olga", "Marina", "Ekaterina", "Natalia", "Yulia",
+		"Nina", "Galina", "Tatiana", "Victoria", "Valentina", "Zoya", "Lyudmila", "Sofia", "Zinaida", "Anastasia", "Kira", "Alisa", "Lidia", "Veronika", "Vasilisa", "Elizaveta",
+		"Karina", "Svetlana", "Polina", "Ksenia", "Lora", "Augusta", "Liliya", "Roza", "Yanina", "Klavdia", "Varvara", "Alla", "Nelli", "Snezhana", "Venera", "Eudokia", "Lyubava",
+		"Iraida", "Ksenia"
+	};
+	string MaleSurnames[surnamenumber] =
+	{
+		"Barinov","Aleshin","Alexeev","Gorbunov","Popov","Abramov","Gavrilov","Elesin","Tyurin","Ezhov","Samsonov","Grigoriev","Tokarev","Zhivaev","Tolstoy","Knyazev",
+		"Evdokimov","Shishin","Lebedev","Obozov", "Lyadov", "Bogomolov", "Gafurov", "Zimin", "Tashilin", "Abakumov", "Sakharov", "Andreev", "Zhidkov", "Samoilov", "Chuzhdin",
+		"Bobylev", "Vorobyov", "Sorokin", "Galkin", "Zhdanov", "Kozlov", "Baranov", "Lisin", "Zaytsev", "Losev", "Konev", "Stupin", "Zaviyalov", "Strokin", "Medvedev", "Rodionov",
+		"Delyagin", "Zhuin", "Vishnevskiy", "Kruglov", "Zhilev", "Sakurov", "Linov", "Kostrov", "Averin", "Zhukov", "Delin", "Sosiskin", "Chashin", "Lesin", "Leshiy", "Mordvin",
+		"Kuznetzov", "Samoilov", "Zhuzhin", "Suhar", "Kobylkin", "Bolshakov", "Prishvin", "Ponovarev", "Pleshakov", "Vizir", "Sudak", "Okunev", "Karpov", "Peskarev", "Zhukovskiy",
+		"Kalebin", "Somov", "Russkikh", "Glazov", "Altshtein", "Belov", "Skupzov", "Zuzin", "Khrenov", "Yabedov", "Atyashkin", "Sharov", "Kolesov", "Gruzd", "Komov", "Spichkin",
+		"Boldin", "Balandin", "Gagarin", "Grachev", "Nemov", "Strelkov", "Berger", "Dulin", "Volgin", "Zakharchuk", "Kostin", "Zelenov", "Lember","Dolopolov", "Nikitin", "Smirnov",
+		"Aliev", "Kuznetzov", "Valyaev", "Gorskiy", "Seropyan", "Sheyanov", "Luzko", "Prokhorov", "Lukyanov", "Shamsutdinov"
+	};
+	string FemaleSurnames[surnamenumber] =
+	{
+		"Barinova","Aleshina","Ivanova","Levina","Kazakova","Danilova","Pushkina","Ermolaeva","Tarakanova","Ekimova","Shishkina","Zolotova","Avdeeva","Klimova","Dmitrieva",
+		"Karpenko","Svetlova","Bashmakova","Karpova","Shalimova", "Potapova", "Zvereva", "Sveridova", "Pegova", "Knutova", "Klimova", "Velikaya", "Dolgova", "Shamenkova", "Sizykh",
+		"Sizova", "Kalinechenko", "Zheglova", "Yarigo", "Vasnezova", "Lobova", "Zalesskih", "Egorova", "Sidorova", "Yamina", "Leshenko", "Lapina", "Tarasova", "Vanina", "Chernigova",
+		"Lukhova", "Kakao", "Chekhova", "Esenina", "Isaeva", "Zubova", "Zubareva", "Krylova", "Kabanova", "Belova", "Baranova", "Volkova", "Baeva", "Katastrofa", "Zhelezova",
+		"Yashina", "Babkina", "Shurova", "Slivina", "Vishneva", "Dvorzova", "Zareva", "Siska", "Pisechkina", "Shurina", "Sambirova", "Dorina", "Portnova", "Krestova", "Gruzdeva",
+		"Vlasova", "Shagaeva", "Zhuk", "Keta", "Kazarina", "Lavrova", "Listova", "Yarushkina", "Mukhina", "Muravieva", "Telegina", "Modnova", "Krasavina", "Samodumskaya", "Rakhmetova",
+		"Rusova", "Tishko", "Uvarova", "Fedulina", "Firsova", "Lazareva", "Romashova", "Tsiplakova", "Belyakova", "Chudova", "Yamilova", "Strakhova", "Znobina", "Kotova", "Kitova",
+		"Furgal", "Brinskaya","Sokolova", "Golubeva", "Drozdova", "Valueva", "Bobko", "Guseva", "Karpenko", "Samodumskaya", "Vanina", "Chernyadieva", "Romashova", "Tsiplakova", "Kim"
+	};
+	cout << "Enter user quantity: "; cin >> UserQuantity;
+	cout << "Enter males in domain (less or equil to " << UserQuantity << "): "; cin >> sexrate;
+	if (UserQuantity > 1000)
+		UserQuantity = 1000;
+	if (sexrate >= UserQuantity)
+		UserQuantity = sexrate;
+	cout << "Enter domain name 1: "; cin >> domain1;
+	cout << "Enter domain name 2: "; cin >> domain2;
+	cout << "Enter password for accounts: "; cin >> pass;
+	int females = UserQuantity - sexrate;
+	domainuser* usrdomain = new domainuser[UserQuantity];
+	for (int i = 0; i < sexrate; i++)
+	{
+		usrdomain[i].getusername(MaleNames[rand() % namenumber], MaleSurnames[rand() % surnamenumber]);
+		usrdomain[i].getpol('M');
+		usrdomain[i].getlogin();
+		usrdomain[i].getdomainname(domain1, domain2);
+		usrdomain[i].setpassword(pass);
+		usrdomain[i].createMobilePhone(64111111 + rand() % 99999999);
+		usrdomain[i].getHomePhone(42 + rand() % 99999);
+		usrdomain[i].getOfficePhone(43 + rand() % 99999);
+	}
+	for (int i = sexrate; i < UserQuantity; i++)
+	{
+		usrdomain[i].getusername(FemaleNames[rand() % namenumber], FemaleSurnames[rand() % surnamenumber]);
+		usrdomain[i].getpol('F');
+		usrdomain[i].getlogin();
+		usrdomain[i].getdomainname(domain1, domain2);
+		usrdomain[i].setpassword(pass);
+		usrdomain[i].createMobilePhone(13211111 + rand() % 99999999);
+		usrdomain[i].getHomePhone(42 + rand() % 99999);
+		usrdomain[i].getOfficePhone(43 + rand() % 99999);
+	}
+	////////////////////////////////////// searching same logins////////////////////////////////////
+	string* loginarray = new string[UserQuantity];					//array of created logins
+	for (int i = 0; i < sexrate; i++)								//fill up male's logins
+		loginarray[i] = usrdomain[i].returnlogin();
+	for (int i = sexrate; i < UserQuantity; i++)
+		loginarray[i] = usrdomain[i].returnlogin();
+	for (int i = 0; i < UserQuantity; i++)
+	{
+		string tempname = loginarray[i];
+		for (int j = 1 + i; j < UserQuantity; j++)
+		{
+			if (tempname == loginarray[j])
+			{
+				sameQuantity++;
+			}
+		}
+	}
+	for (int i = 0; i < UserQuantity; i++)
+	{
+		int k = 0;
+		string tempname = loginarray[i];
+		for (int j = 1 + i; j < UserQuantity; j++)
+		{
+			if (tempname == loginarray[j])
+			{
+				usrdomain[j].flagToSameLogin(true);
+				SetConsoleTextAttribute(col, 4);
+				cout << "Attention!!! " << tempname << " index: " << j << endl;
+				k++;
+				usrdomain[j].changePostfix(k);
+				loginarray[j] = loginarray[j] + to_string(k);
+			}
+		}
+	}
+	SetConsoleTextAttribute(col, 7);
+	int* searchindex = new int[sameQuantity];
+	int k = 0;
+	SetConsoleTextAttribute(col, 2);
+	cout << "Attention!!! Next logins are same: " << sameQuantity << endl;
+	SetConsoleTextAttribute(col, 7);
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	for (int i = 0; i < UserQuantity; i++)
+	{
+			if (usrdomain[i].samelogin==true)
+				SetConsoleTextAttribute(col, 2);
+			
+		
+		usrdomain[i].makeADnames();
+		SetConsoleTextAttribute(col, 7);
+	}
+		ofstream fout("output.txt");
+		for (int i = 0; i < UserQuantity; i++)
+		{
+			fout << usrdomain[i].showobj() << endl;
+		}
+		fout.close();
+		ofstream foutcsv("outputCSV.txt");
+		for (int i = 0; i < UserQuantity; i++)
+		{
+			foutcsv << usrdomain[i].createCSV() << endl;
+		}
+		foutcsv.close();
+		return 0;
+		system("pause");
+}
